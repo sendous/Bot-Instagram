@@ -1,0 +1,4 @@
+2024-07-04 14:38:29,038 - instabot version: 0.117.0 (bot) - INFO - Instabot version: 0.117.0 Started
+2024-07-04 14:38:29,038 - instabot version: 0.117.0 (bot) - DEBUG - Bot imported from /Users/sendous/Documents/Coding/Bot-Instagram/env/lib/python3.11/site-packages/instabot/bot/bot.py
+2024-07-04 14:38:29,039 - instabot version: 0.117.0 (api_login) - INFO - Not yet logged in starting: PRE-LOGIN FLOW!
+2024-07-04 14:39:59,182 - instabot version: 0.117.0 (api) - WARNING - ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
