@@ -1,36 +1,69 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 from instagrapi import Client
-from html2image import Html2Image
+import os
+from dotenv import load_dotenv
 import schedule
 import time
 
-# تنظیمات حساب کاربری اینستاگرام
-USERNAME = "takhminzan"
-PASSWORD = "32&w!6E%)2UPP3="
+# Load environment variables
+load_dotenv()
+command_executor = os.getenv("COMMAND_EXECUTOR") + "/webdriver"
+browserless_token = os.getenv("BBROWSERLESS_TOKEN")
+instagram_username = os.getenv("INSTAGRAM_USERNAME")
+instagram_password = os.getenv("INSTAGRAM_PASSWORD")
 
-# آدرس صفحه وب
-URL = "https://app.takhminzan.com/socials"
-IMAGE_PATH = "prices-post.png"
-CAPTION = "قیمت امروز طلا: \n طلای ۱۸ عیار \n انس طلای جهانی \n سکه امامی \n سکه بهار آزادی \n نیم سکه \n ربع سکه \n سکه گرمی \n . \n . \n #طلا #قیمتطلا #قیمتـطلا #طلایـ۱۸ـعیار #سکه #قیمتـسکه #انسـطلا #انس"
+# Selenium setup
+chrome_options = webdriver.ChromeOptions()
+chrome_options.set_capability('browserless:token', browserless_token)
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--window-size=500,1080")  # Set window size to 1920x1080
+chrome_options.add_argument("--force-device-scale-factor=2")  # Scale factor for higher DPI
 
-CHROME_PATH = "chrome.msi"
+# Check if logged in to Instagram
+def is_logged_in(client):
+    try:
+        client.account_info()
+        return True
+    except Exception:
+        return False
 
-def take_screenshot():
-    hti = Html2Image(size=(430, 513), browser_executable=CHROME_PATH)
-    time.sleep(10)
-    hti.screenshot(url=URL, save_as=IMAGE_PATH)
+def take_screenshot_and_post():
+    # Create a new WebDriver instance
+    driver = webdriver.Remote(
+        command_executor=command_executor,
+        options=chrome_options
+    )
 
-def upload_to_instagram():
+    try:
+        # Navigate to the page
+        driver.get("https://app.takhminzan.com/socials")
+
+        # Wait for the element to load and take a screenshot
+        driver.implicitly_wait(30)
+        element = driver.find_element(By.ID, "root")
+        element.screenshot("prices-post.png")
+    finally:
+        # Quit the WebDriver instance
+        driver.quit()
+
+    # Instagram setup
     cl = Client()
-    cl.login(USERNAME, PASSWORD)
-    cl.photo_upload(IMAGE_PATH, CAPTION)
+    if not is_logged_in(cl):
+        cl.login(instagram_username, instagram_password)
 
-def job():
-    take_screenshot()
-    upload_to_instagram()
+    # Upload the screenshot to Instagram
+    title = os.getenv("TITLE")
+    caption = os.getenv("CAPTION")
+    hashtags = os.getenv("HASHTAG")
+    post_text = f"{title}\n{caption}\n.\n.\n{hashtags}"
+    
+    cl.photo_upload("prices-post.png", post_text)
 
-# زمان‌بندی برای اجرا در هر روز ساعت ۸:۳۰ شب
-schedule.every().day.at("20:59").do(job)
-# job()
+# Schedule the task
+# schedule.every().day.at("20:30").do(take_screenshot_and_post)
+take_screenshot_and_post()
 
 while True:
     schedule.run_pending()
