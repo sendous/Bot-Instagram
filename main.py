@@ -57,13 +57,13 @@ def take_screenshot_and_post():
     title = os.getenv("TITLE")
     caption = os.getenv("CAPTION")
     hashtags = os.getenv("HASHTAG")
-    post_text = f"{title}\n{caption}\n{hashtags}"
+    post_text = f"{title}\n{caption}\n . \n . \n{hashtags}"
     
     cl.photo_upload("prices-post.png", post_text)
 
 # Schedule the task
-# schedule.every().day.at("20:30").do(take_screenshot_and_post)
-take_screenshot_and_post()
+schedule.every().day.at("20:30").do(take_screenshot_and_post)
+# take_screenshot_and_post()
 
 while True:
     schedule.run_pending()
