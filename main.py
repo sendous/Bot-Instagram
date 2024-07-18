@@ -57,7 +57,7 @@ def take_screenshot_and_post():
     title = os.getenv("TITLE")
     caption = os.getenv("CAPTION")
     hashtags = os.getenv("HASHTAG")
-    post_text = f"{title}\n{caption}\n.\n.\n{hashtags}"
+    post_text = f"{title}\n{caption}\n{hashtags}"
     
     cl.photo_upload("prices-post.png", post_text)
 
