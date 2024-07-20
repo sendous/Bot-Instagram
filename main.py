@@ -30,40 +30,49 @@ def is_logged_in(client):
         return False
 
 def take_screenshot_and_post():
-    # Create a new WebDriver instance
-    driver = webdriver.Remote(
-        command_executor=command_executor,
-        options=chrome_options
-    )
+    while True:
+        try:
+            # Create a new WebDriver instance
+            driver = webdriver.Remote(
+                command_executor=command_executor,
+                options=chrome_options
+            )
 
-    try:
-        # Navigate to the page
-        driver.get("https://app.takhminzan.com/socials")
+            try:
+                # Navigate to the page
+                driver.get(os.getenv("URL_SCRAP"))
 
-        # Wait for the element to load and take a screenshot
-        driver.implicitly_wait(30)
-        element = driver.find_element(By.ID, "root")
-        element.screenshot("prices-post.png")
-    finally:
-        # Quit the WebDriver instance
-        driver.quit()
+                # Wait for the element to load and take a screenshot
+                driver.implicitly_wait(30)
+                element = driver.find_element(By.ID, "scrshot-insta")
+                element.screenshot("prices-post.png")
+            finally:
+                # Quit the WebDriver instance
+                driver.quit()
 
-    # Instagram setup
-    cl = Client()
-    if not is_logged_in(cl):
-        cl.login(instagram_username, instagram_password)
+            # Instagram setup
+            cl = Client()
+            if not is_logged_in(cl):
+                cl.login(instagram_username, instagram_password)
 
-    # Upload the screenshot to Instagram
-    title = os.getenv("TITLE")
-    caption = os.getenv("CAPTION")
-    hashtags = os.getenv("HASHTAG")
-    post_text = f"{title}\n{caption}\n . \n . \n{hashtags}"
-    
-    cl.photo_upload("prices-post.png", post_text)
+            # Upload the screenshot to Instagram
+            title = os.getenv("TITLE")
+            caption = os.getenv("CAPTION")
+            hashtags = os.getenv("HASHTAG")
+            post_text = f"{title}\n{caption}\n . \n . \n{hashtags}"
+            
+            cl.photo_upload("prices-post.png", post_text)
+            
+            # If everything is successful, break the loop
+            break
+
+        except Exception as e:
+            print(f"An error occurred: {e}. Retrying...")
 
 # Schedule the task
-schedule.every().day.at("20:30").do(take_screenshot_and_post)
-# take_screenshot_and_post()
+# schedule.every().day.at("20:30").do(take_screenshot_and_post)
+take_screenshot_and_post()
+
 
 while True:
     schedule.run_pending()
