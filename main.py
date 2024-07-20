@@ -45,6 +45,9 @@ def take_screenshot_and_post():
                 # Wait for the element to load and take a screenshot
                 driver.implicitly_wait(30)
                 element = driver.find_element(By.ID, "scrshot-insta")
+                
+                # Add a 10-second delay before taking the screenshot
+                time.sleep(10)
                 element.screenshot("prices-post.png")
             finally:
                 # Quit the WebDriver instance
